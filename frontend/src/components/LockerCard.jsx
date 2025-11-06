@@ -6,6 +6,7 @@ import {
   Typography,
   IconButton,
   Box,
+  Chip,
 } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -60,6 +61,21 @@ const LockerCard = ({ locker, onEdit, onDelete, onClick }) => {
             </Typography>
           </Box>
         </Box>
+        
+        {(locker.total_assets !== undefined || locker.withdrawn_assets !== undefined) && (
+          <Box sx={{ mt: 2 }}>
+            <Chip
+              label={`Withdrawn: ${locker.withdrawn_assets || 0} / Total: ${locker.total_assets || 0}`}
+              size="small"
+              sx={{
+                backgroundColor: 'rgba(255, 152, 0, 0.2)',
+                color: '#ff9800',
+                border: '1px solid rgba(255, 152, 0, 0.5)',
+                fontWeight: 'bold',
+              }}
+            />
+          </Box>
+        )}
       </CardContent>
       
       <CardActions className="action-buttons" sx={{ justifyContent: 'flex-end', px: 2, pb: 2 }}>

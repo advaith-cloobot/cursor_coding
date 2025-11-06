@@ -63,5 +63,90 @@ export const deleteAsset = async (assetId) => {
   return response.data;
 };
 
+// ============= FILE UPLOAD API =============
+
+export const uploadAssetFiles = async (assetId, files) => {
+  const formData = new FormData();
+  files.forEach((file) => {
+    formData.append('files', file);
+  });
+  const response = await api.post(`/assets/${assetId}/files`, formData, {
+    headers: {
+      'Content-Type': 'multipart/form-data',
+    },
+  });
+  return response.data;
+};
+
+export const getAssetFiles = async (assetId) => {
+  const response = await api.get(`/assets/${assetId}/files`);
+  return response.data;
+};
+
+export const deleteFile = async (fileId) => {
+  const response = await api.delete(`/files/${fileId}`);
+  return response.data;
+};
+
+export const setPrimaryImage = async (fileId) => {
+  const response = await api.put(`/files/${fileId}/set-primary`);
+  return response.data;
+};
+
+export const getFileUrl = (filePath) => {
+  if (filePath.startsWith('http')) return filePath;
+  const path = filePath.replace(/.*uploads[\\/]/, '').replace(/\\/g, '/');
+  return `http://localhost:5000/api/uploads/${path}`;
+};
+
+// ============= TRANSACTION API =============
+
+export const getTransactions = async (filters = {}) => {
+  const params = new URLSearchParams();
+  if (filters.asset_id) params.append('asset_id', filters.asset_id);
+  if (filters.asset_type) params.append('asset_type', filters.asset_type);
+  const response = await api.get(`/transactions?${params.toString()}`);
+  return response.data;
+};
+
+export const getTransaction = async (transactionId) => {
+  const response = await api.get(`/transactions/${transactionId}`);
+  return response.data;
+};
+
+export const createTransaction = async (transactionData) => {
+  const response = await api.post('/transactions', transactionData);
+  return response.data;
+};
+
+export const updateTransaction = async (transactionId, transactionData) => {
+  const response = await api.put(`/transactions/${transactionId}`, transactionData);
+  return response.data;
+};
+
+export const deleteTransaction = async (transactionId) => {
+  const response = await api.delete(`/transactions/${transactionId}`);
+  return response.data;
+};
+
+export const getAssetTransactions = async (assetId) => {
+  const response = await api.get(`/assets/${assetId}/transactions`);
+  return response.data;
+};
+
+// ============= EDIT LOG API =============
+
+export const getAssetEditLog = async (assetId) => {
+  const response = await api.get(`/assets/${assetId}/edit-log`);
+  return response.data;
+};
+
+// ============= DASHBOARD API =============
+
+export const getLockerDashboard = async (lockerId) => {
+  const response = await api.get(`/lockers/${lockerId}/dashboard`);
+  return response.data;
+};
+
 export default api;
 

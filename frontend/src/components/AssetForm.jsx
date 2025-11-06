@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   Dialog,
   DialogTitle,
@@ -12,7 +12,15 @@ import {
   Select,
   MenuItem,
   InputAdornment,
+  Typography,
+  Paper,
+  IconButton,
+  Grid,
+  Divider,
 } from '@mui/material';
+import CloudUploadIcon from '@mui/icons-material/CloudUpload';
+import DeleteIcon from '@mui/icons-material/Delete';
+import PictureAsPdfIcon from '@mui/icons-material/PictureAsPdf';
 
 const AssetForm = ({ open, onClose, onSubmit, initialData }) => {
   const [formData, setFormData] = useState({
@@ -23,7 +31,11 @@ const AssetForm = ({ open, onClose, onSubmit, initialData }) => {
     details: '',
     worth: '',
     document_type: '',
+    responsible_person: '',
   });
+  const [selectedFiles, setSelectedFiles] = useState([]);
+  const [filePreviews, setFilePreviews] = useState([]);
+  const fileInputRef = useRef(null);
 
   useEffect(() => {
     if (initialData) {
@@ -35,6 +47,7 @@ const AssetForm = ({ open, onClose, onSubmit, initialData }) => {
         details: initialData.details || '',
         worth: initialData.worth || '',
         document_type: initialData.document_type || '',
+        responsible_person: initialData.responsible_person || '',
       });
     } else {
       setFormData({
@@ -45,8 +58,12 @@ const AssetForm = ({ open, onClose, onSubmit, initialData }) => {
         details: '',
         worth: '',
         document_type: '',
+        responsible_person: '',
       });
     }
+    // Reset files when dialog opens/closes
+    setSelectedFiles([]);
+    setFilePreviews([]);
   }, [initialData, open]);
 
   const handleChange = (e) => {
@@ -57,7 +74,63 @@ const AssetForm = ({ open, onClose, onSubmit, initialData }) => {
     }));
   };
 
-  const handleSubmit = (e) => {
+  const handleFileSelect = (event) => {
+    const newFiles = Array.from(event.target.files);
+    processFiles(newFiles);
+  };
+
+  const processFiles = (newFiles) => {
+    const previews = [];
+    newFiles.forEach((file) => {
+      const fileType = file.type.startsWith('image/') ? 'image' : 'pdf';
+      if (fileType === 'image') {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          previews.push({
+            file,
+            preview: e.target.result,
+            type: 'image',
+            name: file.name,
+          });
+          if (previews.length === newFiles.length) {
+            setFilePreviews((prev) => [...prev, ...previews]);
+            setSelectedFiles((prev) => [...prev, ...newFiles]);
+          }
+        };
+        reader.readAsDataURL(file);
+      } else {
+        previews.push({
+          file,
+          preview: null,
+          type: 'pdf',
+          name: file.name,
+        });
+        if (previews.length === newFiles.length) {
+          setFilePreviews((prev) => [...prev, ...previews]);
+          setSelectedFiles((prev) => [...prev, ...newFiles]);
+        }
+      }
+    });
+  };
+
+  const handleDragOver = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+  };
+
+  const handleDrop = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    const droppedFiles = Array.from(e.dataTransfer.files);
+    processFiles(droppedFiles);
+  };
+
+  const removeFile = (index) => {
+    setSelectedFiles((prev) => prev.filter((_, i) => i !== index));
+    setFilePreviews((prev) => prev.filter((_, i) => i !== index));
+  };
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
     
     // Clean up data based on asset type
@@ -73,11 +146,12 @@ const AssetForm = ({ open, onClose, onSubmit, initialData }) => {
       cleanedData.document_type = null;
     }
     
-    onSubmit(cleanedData);
+    // Pass files along with form data
+    onSubmit(cleanedData, selectedFiles);
   };
 
   return (
-    <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
+    <Dialog open={open} onClose={onClose} maxWidth="md" fullWidth>
       <form onSubmit={handleSubmit}>
         <DialogTitle>
           {initialData ? 'Edit Asset' : 'Add New Asset'}
@@ -168,6 +242,133 @@ const AssetForm = ({ open, onClose, onSubmit, initialData }) => {
               multiline
               rows={4}
             />
+
+            {/* Responsible person field (for initial transaction) */}
+            {!initialData && (
+              <TextField
+                name="responsible_person"
+                label="Responsible Person"
+                placeholder="Who is creating this asset?"
+                value={formData.responsible_person}
+                onChange={handleChange}
+                fullWidth
+              />
+            )}
+
+            {/* File Upload Section - Only show when creating new asset */}
+            {!initialData && (
+              <>
+                <Divider sx={{ my: 2 }} />
+                <Typography variant="h6" sx={{ color: 'text.primary', mb: 1 }}>
+                  Upload Files (Optional)
+                </Typography>
+                <Paper
+                  sx={{
+                    p: 2,
+                    border: '2px dashed',
+                    borderColor: 'primary.main',
+                    textAlign: 'center',
+                    cursor: 'pointer',
+                    backgroundColor: 'rgba(0, 0, 0, 0.02)',
+                    '&:hover': {
+                      backgroundColor: 'rgba(0, 0, 0, 0.05)',
+                    },
+                  }}
+                  onDragOver={handleDragOver}
+                  onDrop={handleDrop}
+                  onClick={() => fileInputRef.current?.click()}
+                >
+                  <input
+                    ref={fileInputRef}
+                    type="file"
+                    multiple
+                    accept="image/*,.pdf"
+                    style={{ display: 'none' }}
+                    onChange={handleFileSelect}
+                  />
+                  <CloudUploadIcon sx={{ fontSize: 40, color: 'primary.main', mb: 1 }} />
+                  <Typography variant="body2" gutterBottom>
+                    Drag & Drop files here or click to select
+                  </Typography>
+                  <Typography variant="caption" color="text.secondary">
+                    Supports: Images (JPEG, PNG, GIF) and PDF files
+                  </Typography>
+                </Paper>
+
+                {/* Selected Files Preview */}
+                {filePreviews.length > 0 && (
+                  <Box sx={{ mt: 2 }}>
+                    <Typography variant="subtitle2" gutterBottom sx={{ mb: 1 }}>
+                      Selected Files ({filePreviews.length})
+                    </Typography>
+                    <Grid container spacing={1}>
+                      {filePreviews.map((preview, index) => (
+                        <Grid item xs={6} sm={4} md={3} key={index}>
+                          <Paper
+                            sx={{
+                              p: 1,
+                              position: 'relative',
+                              backgroundColor: 'rgba(0, 0, 0, 0.02)',
+                            }}
+                          >
+                            {preview.type === 'image' ? (
+                              <Box
+                                component="img"
+                                src={preview.preview}
+                                alt={preview.name}
+                                sx={{
+                                  width: '100%',
+                                  height: 100,
+                                  objectFit: 'cover',
+                                  borderRadius: 1,
+                                }}
+                              />
+                            ) : (
+                              <Box
+                                sx={{
+                                  width: '100%',
+                                  height: 100,
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  justifyContent: 'center',
+                                  backgroundColor: 'rgba(0, 0, 0, 0.05)',
+                                  borderRadius: 1,
+                                }}
+                              >
+                                <PictureAsPdfIcon sx={{ fontSize: 32, color: 'error.main' }} />
+                              </Box>
+                            )}
+                            <Typography
+                              variant="caption"
+                              sx={{
+                                display: 'block',
+                                mt: 0.5,
+                                overflow: 'hidden',
+                                textOverflow: 'ellipsis',
+                                whiteSpace: 'nowrap',
+                              }}
+                            >
+                              {preview.name}
+                            </Typography>
+                            <IconButton
+                              size="small"
+                              color="error"
+                              sx={{ position: 'absolute', top: 4, right: 4 }}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                removeFile(index);
+                              }}
+                            >
+                              <DeleteIcon fontSize="small" />
+                            </IconButton>
+                          </Paper>
+                        </Grid>
+                      ))}
+                    </Grid>
+                  </Box>
+                )}
+              </>
+            )}
           </Box>
         </DialogContent>
         <DialogActions sx={{ px: 3, pb: 2 }}>
