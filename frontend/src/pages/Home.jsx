@@ -140,8 +140,8 @@ const Home = () => {
             gutterBottom 
             fontWeight="bold"
             sx={{ 
-              color: 'white',
-              textShadow: '2px 2px 4px rgba(0,0,0,0.3)'
+              color: '#000000',
+              textShadow: '2px 2px 4px rgba(255,255,255,0.5)'
             }}
           >
             Locker Organizer
@@ -149,8 +149,8 @@ const Home = () => {
           <Typography 
             variant="subtitle1" 
             sx={{ 
-              color: 'rgba(255,255,255,0.9)',
-              textShadow: '1px 1px 2px rgba(0,0,0,0.2)'
+              color: 'rgba(255,255,255,0.8)',
+              textShadow: '1px 1px 2px rgba(0,0,0,0.3)'
             }}
           >
             Manage your family's valuable assets across multiple lockers
@@ -161,16 +161,16 @@ const Home = () => {
           startIcon={<AddIcon />}
           onClick={handleCreateLocker}
           sx={{
-            backgroundColor: 'rgba(255, 255, 255, 0.95)',
-            color: 'primary.main',
+            backgroundColor: '#1976d2',
+            color: 'white',
             fontWeight: 'bold',
             px: 3,
             py: 1.5,
-            boxShadow: '0 4px 14px rgba(0,0,0,0.3)',
+            boxShadow: '0 4px 14px rgba(0,0,0,0.4)',
             '&:hover': {
-              backgroundColor: 'white',
+              backgroundColor: '#1565c0',
               transform: 'translateY(-2px)',
-              boxShadow: '0 6px 20px rgba(0,0,0,0.4)',
+              boxShadow: '0 6px 20px rgba(0,0,0,0.5)',
             },
             transition: 'all 0.3s ease',
           }}
@@ -180,21 +180,23 @@ const Home = () => {
       </Box>
 
       {loading ? (
-        <Typography sx={{ color: 'white' }}>Loading...</Typography>
+        <Typography sx={{ color: 'rgba(255,255,255,0.8)' }}>Loading...</Typography>
       ) : lockers.length === 0 ? (
         <Box
           sx={{
             textAlign: 'center',
             py: 8,
-            backgroundColor: 'rgba(255, 255, 255, 0.95)',
+            backgroundColor: 'rgba(30, 30, 50, 0.8)',
+            backdropFilter: 'blur(10px)',
             borderRadius: 3,
-            boxShadow: '0 8px 32px rgba(0,0,0,0.1)',
+            border: '1px solid rgba(255, 255, 255, 0.1)',
+            boxShadow: '0 8px 32px rgba(0,0,0,0.3)',
           }}
         >
-          <Typography variant="h6" color="text.secondary" gutterBottom>
+          <Typography variant="h6" sx={{ color: 'rgba(255,255,255,0.9)' }} gutterBottom>
             No lockers yet
           </Typography>
-          <Typography variant="body2" color="text.secondary">
+          <Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.7)' }}>
             Click the "Add Locker" button to create your first locker
           </Typography>
         </Box>

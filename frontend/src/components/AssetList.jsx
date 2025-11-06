@@ -27,15 +27,17 @@ const AssetList = ({ assets, onEdit, onDelete }) => {
         sx={{
           textAlign: 'center',
           py: 6,
-          backgroundColor: 'rgba(255, 255, 255, 0.95)',
+          backgroundColor: 'rgba(30, 30, 50, 0.8)',
+          backdropFilter: 'blur(10px)',
           borderRadius: 3,
-          boxShadow: '0 8px 32px rgba(0,0,0,0.1)',
+          border: '1px solid rgba(255, 255, 255, 0.1)',
+          boxShadow: '0 8px 32px rgba(0,0,0,0.3)',
         }}
       >
-        <Typography variant="h6" color="text.secondary" gutterBottom>
+        <Typography variant="h6" sx={{ color: 'rgba(255,255,255,0.9)' }} gutterBottom>
           No assets in this locker
         </Typography>
-        <Typography variant="body2" color="text.secondary">
+        <Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.7)' }}>
           Click the "Add Asset" button to add your first asset
         </Typography>
       </Box>
@@ -49,9 +51,10 @@ const AssetList = ({ assets, onEdit, onDelete }) => {
           key={asset.id} 
           sx={{ 
             mb: 2,
-            backgroundColor: 'rgba(255, 255, 255, 0.95)',
+            backgroundColor: 'rgba(30, 30, 50, 0.8)',
             backdropFilter: 'blur(10px)',
-            boxShadow: '0 4px 16px rgba(0,0,0,0.1)',
+            border: '1px solid rgba(255, 255, 255, 0.1)',
+            boxShadow: '0 4px 16px rgba(0,0,0,0.4)',
             transition: 'transform 0.2s, box-shadow 0.2s',
             '&:hover': {
               boxShadow: '0 6px 24px rgba(0,0,0,0.15)',
@@ -70,10 +73,10 @@ const AssetList = ({ assets, onEdit, onDelete }) => {
             onClick={() => handleToggleExpand(asset.id)}
           >
             <Box sx={{ flexGrow: 1 }}>
-              <Typography variant="h6" component="div">
+              <Typography variant="h6" component="div" sx={{ color: '#ffffff', fontWeight: 'bold' }}>
                 {asset.name}
               </Typography>
-              <Typography variant="body2" color="text.secondary" sx={{ textTransform: 'capitalize' }}>
+              <Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.7)', textTransform: 'capitalize' }}>
                 {asset.asset_type}
               </Typography>
             </Box>

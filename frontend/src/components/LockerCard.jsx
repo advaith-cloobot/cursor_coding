@@ -28,32 +28,34 @@ const LockerCard = ({ locker, onEdit, onDelete, onClick }) => {
         display: 'flex',
         flexDirection: 'column',
         cursor: 'pointer',
-        backgroundColor: 'rgba(255, 255, 255, 0.95)',
+        backgroundColor: 'rgba(30, 30, 50, 0.8)',
         backdropFilter: 'blur(10px)',
+        border: '1px solid rgba(255, 255, 255, 0.1)',
         transition: 'transform 0.3s, box-shadow 0.3s',
-        boxShadow: '0 8px 32px rgba(0,0,0,0.1)',
+        boxShadow: '0 8px 32px rgba(0,0,0,0.4)',
         '&:hover': {
           transform: 'translateY(-8px)',
-          boxShadow: '0 12px 40px rgba(0,0,0,0.2)',
+          backgroundColor: 'rgba(40, 40, 60, 0.9)',
+          boxShadow: '0 12px 40px rgba(0,0,0,0.6)',
         },
       }}
       onClick={handleCardClick}
     >
       <CardContent sx={{ flexGrow: 1 }}>
         <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-          <LockIcon sx={{ mr: 1, color: 'primary.main', fontSize: 30 }} />
-          <Typography variant="h5" component="h2" fontWeight="bold">
+          <LockIcon sx={{ mr: 1, color: '#64b5f6', fontSize: 30 }} />
+          <Typography variant="h5" component="h2" fontWeight="bold" sx={{ color: '#ffffff' }}>
             {locker.name}
           </Typography>
         </Box>
         
         <Box sx={{ display: 'flex', alignItems: 'flex-start', mb: 1 }}>
-          <LocationOnIcon sx={{ mr: 1, color: 'text.secondary', fontSize: 20, mt: 0.5 }} />
+          <LocationOnIcon sx={{ mr: 1, color: '#90caf9', fontSize: 20, mt: 0.5 }} />
           <Box>
-            <Typography variant="body1" color="text.primary" fontWeight="500">
+            <Typography variant="body1" sx={{ color: '#ffffff', fontWeight: '500' }}>
               {locker.location_name}
             </Typography>
-            <Typography variant="body2" color="text.secondary">
+            <Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.7)' }}>
               {locker.address}
             </Typography>
           </Box>

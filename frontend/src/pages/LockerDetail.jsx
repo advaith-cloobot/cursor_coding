@@ -135,7 +135,7 @@ const LockerDetail = () => {
   if (loading) {
     return (
       <Container maxWidth="lg" sx={{ py: 4 }}>
-        <Typography>Loading...</Typography>
+        <Typography sx={{ color: 'rgba(255,255,255,0.8)' }}>Loading...</Typography>
       </Container>
     );
   }
@@ -143,7 +143,7 @@ const LockerDetail = () => {
   if (!locker) {
     return (
       <Container maxWidth="lg" sx={{ py: 4 }}>
-        <Typography>Locker not found</Typography>
+        <Typography sx={{ color: 'rgba(255,255,255,0.8)' }}>Locker not found</Typography>
       </Container>
     );
   }
@@ -158,13 +158,14 @@ const LockerDetail = () => {
           sx={{
             cursor: 'pointer',
             textDecoration: 'none',
-            color: 'rgba(255,255,255,0.9)',
-            '&:hover': { textDecoration: 'underline', color: 'white' },
+            color: 'rgba(255,255,255,0.8)',
+            fontWeight: '500',
+            '&:hover': { textDecoration: 'underline', color: '#ffffff' },
           }}
         >
           Home
         </Link>
-        <Typography variant="body1" sx={{ color: 'rgba(255,255,255,0.9)' }}>
+        <Typography variant="body1" sx={{ color: 'rgba(255,255,255,0.9)', fontWeight: '500' }}>
           {locker.name}
         </Typography>
       </Breadcrumbs>
@@ -173,22 +174,24 @@ const LockerDetail = () => {
         sx={{ 
           p: 3, 
           mb: 4,
-          backgroundColor: 'rgba(255, 255, 255, 0.95)',
-          boxShadow: '0 8px 32px rgba(0,0,0,0.1)',
+          backgroundColor: 'rgba(30, 30, 50, 0.8)',
+          backdropFilter: 'blur(10px)',
+          border: '1px solid rgba(255, 255, 255, 0.1)',
+          boxShadow: '0 8px 32px rgba(0,0,0,0.4)',
         }}
       >
         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: 2 }}>
           <Box sx={{ flex: 1 }}>
-            <Typography variant="h4" component="h1" gutterBottom fontWeight="bold">
+            <Typography variant="h4" component="h1" gutterBottom fontWeight="bold" sx={{ color: '#ffffff' }}>
               {locker.name}
             </Typography>
             <Box sx={{ display: 'flex', alignItems: 'flex-start', mt: 2 }}>
-              <LocationOnIcon sx={{ mr: 1, color: 'text.secondary', mt: 0.5 }} />
+              <LocationOnIcon sx={{ mr: 1, color: '#90caf9', mt: 0.5 }} />
               <Box>
-                <Typography variant="h6" color="text.primary">
+                <Typography variant="h6" sx={{ color: '#ffffff', fontWeight: '500' }}>
                   {locker.location_name}
                 </Typography>
-                <Typography variant="body1" color="text.secondary">
+                <Typography variant="body1" sx={{ color: 'rgba(255,255,255,0.7)' }}>
                   {locker.address}
                 </Typography>
               </Box>
@@ -199,16 +202,16 @@ const LockerDetail = () => {
             startIcon={<AddIcon />}
             onClick={handleCreateAsset}
             sx={{
-              backgroundColor: 'primary.main',
+              backgroundColor: '#1976d2',
               color: 'white',
               fontWeight: 'bold',
               px: 3,
               py: 1.5,
-              boxShadow: '0 4px 14px rgba(0,0,0,0.3)',
+              boxShadow: '0 4px 14px rgba(0,0,0,0.4)',
               '&:hover': {
-                backgroundColor: 'primary.dark',
+                backgroundColor: '#1565c0',
                 transform: 'translateY(-2px)',
-                boxShadow: '0 6px 20px rgba(0,0,0,0.4)',
+                boxShadow: '0 6px 20px rgba(0,0,0,0.5)',
               },
               transition: 'all 0.3s ease',
             }}
@@ -234,8 +237,8 @@ const LockerDetail = () => {
           gutterBottom 
           fontWeight="bold"
           sx={{ 
-            color: 'white',
-            textShadow: '2px 2px 4px rgba(0,0,0,0.3)'
+            color: '#ffffff',
+            textShadow: '2px 2px 4px rgba(0,0,0,0.5)'
           }}
         >
           Assets ({assets.length})
@@ -256,16 +259,18 @@ const LockerDetail = () => {
           position: 'fixed',
           bottom: 32,
           right: 32,
-          backgroundColor: 'rgba(255, 255, 255, 0.95)',
-          color: 'text.primary',
+          backgroundColor: 'rgba(30, 30, 50, 0.9)',
+          color: '#ffffff',
+          border: '1px solid rgba(255, 255, 255, 0.2)',
+          backdropFilter: 'blur(10px)',
           fontWeight: 'bold',
           px: 3,
           py: 1.5,
-          boxShadow: '0 4px 14px rgba(0,0,0,0.3)',
+          boxShadow: '0 4px 14px rgba(0,0,0,0.4)',
           '&:hover': {
-            backgroundColor: 'white',
+            backgroundColor: 'rgba(40, 40, 60, 0.95)',
             transform: 'translateY(-2px)',
-            boxShadow: '0 6px 20px rgba(0,0,0,0.4)',
+            boxShadow: '0 6px 20px rgba(0,0,0,0.5)',
           },
           transition: 'all 0.3s ease',
         }}
