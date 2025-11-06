@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   List,
   ListItem,
@@ -7,18 +7,60 @@ import {
   IconButton,
   Collapse,
   Typography,
+  Avatar,
+  Chip,
 } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';
+import ImageIcon from '@mui/icons-material/Image';
+import PictureAsPdfIcon from '@mui/icons-material/PictureAsPdf';
 import AssetDetails from './AssetDetails';
+import { getAssetFiles, getFileUrl } from '../services/api';
 
-const AssetList = ({ assets, onEdit, onDelete }) => {
+const AssetList = ({ assets, onEdit, onDelete, onAssetClick }) => {
   const [expandedAsset, setExpandedAsset] = useState(null);
+  const [assetThumbnails, setAssetThumbnails] = useState({});
+
+  useEffect(() => {
+    // Load thumbnails for all assets
+    const loadThumbnails = async () => {
+      const thumbnails = {};
+      for (const asset of assets) {
+        try {
+          const files = await getAssetFiles(asset.id);
+          const primaryImage = files.find((f) => f.is_primary && f.file_type === 'image');
+          if (primaryImage) {
+            thumbnails[asset.id] = getFileUrl(primaryImage.file_path);
+          }
+        } catch (error) {
+          console.error(`Failed to load files for asset ${asset.id}:`, error);
+        }
+      }
+      setAssetThumbnails(thumbnails);
+    };
+
+    if (assets.length > 0) {
+      loadThumbnails();
+    }
+  }, [assets]);
 
   const handleToggleExpand = (assetId) => {
     setExpandedAsset(expandedAsset === assetId ? null : assetId);
+  };
+
+  const getStatusColor = (status) => {
+    switch (status) {
+      case 'deposited':
+        return 'success';
+      case 'withdrawn':
+        return 'warning';
+      case 'removed':
+        return 'error';
+      default:
+        return 'default';
+    }
   };
 
   if (assets.length === 0) {
@@ -70,12 +112,48 @@ const AssetList = ({ assets, onEdit, onDelete }) => {
                 backgroundColor: 'action.hover',
               },
             }}
-            onClick={() => handleToggleExpand(asset.id)}
+            onClick={(e) => {
+              if (e.target.closest('button')) {
+                return; // Don't expand if clicking buttons
+              }
+              if (onAssetClick) {
+                onAssetClick(asset.id);
+              } else {
+                handleToggleExpand(asset.id);
+              }
+            }}
           >
+            {/* Thumbnail */}
+            <Avatar
+              src={assetThumbnails[asset.id]}
+              variant="rounded"
+              sx={{
+                width: 80,
+                height: 80,
+                mr: 2,
+                backgroundColor: 'rgba(255,255,255,0.1)',
+              }}
+            >
+              {asset.asset_type === 'document' ? (
+                <PictureAsPdfIcon sx={{ fontSize: 40 }} />
+              ) : (
+                <ImageIcon sx={{ fontSize: 40 }} />
+              )}
+            </Avatar>
+
             <Box sx={{ flexGrow: 1 }}>
-              <Typography variant="h6" component="div" sx={{ color: '#ffffff', fontWeight: 'bold' }}>
-                {asset.name}
-              </Typography>
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 0.5 }}>
+                <Typography variant="h6" component="div" sx={{ color: '#ffffff', fontWeight: 'bold' }}>
+                  {asset.name}
+                </Typography>
+                {asset.status && (
+                  <Chip
+                    label={asset.status.charAt(0).toUpperCase() + asset.status.slice(1)}
+                    size="small"
+                    color={getStatusColor(asset.status)}
+                  />
+                )}
+              </Box>
               <Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.7)', textTransform: 'capitalize' }}>
                 {asset.asset_type}
               </Typography>

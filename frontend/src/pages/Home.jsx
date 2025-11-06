@@ -15,6 +15,7 @@ import {
   Button,
 } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
+import ReceiptIcon from '@mui/icons-material/Receipt';
 import LockerCard from '../components/LockerCard';
 import LockerForm from '../components/LockerForm';
 import {
@@ -26,7 +27,7 @@ import {
 
 const Home = () => {
   const navigate = useNavigate();
-  const [lockers, setLockers] = useState([]);
+  const [lockers, setLockers] = useState({ withdrawn: [], intact: [] });
   const [loading, setLoading] = useState(true);
   const [formOpen, setFormOpen] = useState(false);
   const [editingLocker, setEditingLocker] = useState(null);
@@ -156,32 +157,59 @@ const Home = () => {
             Manage your family's valuable assets across multiple lockers
           </Typography>
         </Box>
-        <Button
-          variant="contained"
-          startIcon={<AddIcon />}
-          onClick={handleCreateLocker}
-          sx={{
-            backgroundColor: '#1976d2',
-            color: 'white',
-            fontWeight: 'bold',
-            px: 3,
-            py: 1.5,
-            boxShadow: '0 4px 14px rgba(0,0,0,0.4)',
-            '&:hover': {
-              backgroundColor: '#1565c0',
-              transform: 'translateY(-2px)',
-              boxShadow: '0 6px 20px rgba(0,0,0,0.5)',
-            },
-            transition: 'all 0.3s ease',
-          }}
-        >
-          Add Locker
-        </Button>
+        <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap' }}>
+          <Button
+            variant="outlined"
+            startIcon={<ReceiptIcon />}
+            onClick={() => navigate('/transactions')}
+            sx={{
+              backgroundColor: 'rgba(255, 255, 255, 0.95)',
+              color: 'primary.main',
+              borderColor: 'primary.main',
+              borderWidth: 2,
+              fontWeight: 'bold',
+              px: 3,
+              py: 1.5,
+              boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+              '&:hover': {
+                backgroundColor: 'white',
+                borderColor: 'primary.dark',
+                borderWidth: 2,
+                transform: 'translateY(-2px)',
+                boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
+              },
+              transition: 'all 0.3s ease',
+            }}
+          >
+            Transaction Ledger
+          </Button>
+          <Button
+            variant="contained"
+            startIcon={<AddIcon />}
+            onClick={handleCreateLocker}
+            sx={{
+              backgroundColor: '#1976d2',
+              color: 'white',
+              fontWeight: 'bold',
+              px: 3,
+              py: 1.5,
+              boxShadow: '0 4px 14px rgba(0,0,0,0.4)',
+              '&:hover': {
+                backgroundColor: '#1565c0',
+                transform: 'translateY(-2px)',
+                boxShadow: '0 6px 20px rgba(0,0,0,0.5)',
+              },
+              transition: 'all 0.3s ease',
+            }}
+          >
+            Add Locker
+          </Button>
+        </Box>
       </Box>
 
       {loading ? (
         <Typography sx={{ color: 'rgba(255,255,255,0.8)' }}>Loading...</Typography>
-      ) : lockers.length === 0 ? (
+      ) : lockers.withdrawn.length === 0 && lockers.intact.length === 0 ? (
         <Box
           sx={{
             textAlign: 'center',
@@ -201,18 +229,59 @@ const Home = () => {
           </Typography>
         </Box>
       ) : (
-        <Grid container spacing={3}>
-          {lockers.map((locker) => (
-            <Grid item xs={12} sm={6} md={4} key={locker.id}>
-              <LockerCard
-                locker={locker}
-                onEdit={handleEditLocker}
-                onDelete={handleDeleteClick}
-                onClick={handleLockerClick}
-              />
-            </Grid>
-          ))}
-        </Grid>
+        <>
+          {/* Section 1: Lockers with withdrawn assets */}
+          {lockers.withdrawn.length > 0 && (
+            <Box sx={{ mb: 4 }}>
+              <Typography 
+                variant="h5" 
+                component="h2" 
+                gutterBottom 
+                sx={{ color: '#000000', mb: 2, fontWeight: 'bold' }}
+              >
+                Lockers with Withdrawn Assets
+              </Typography>
+              <Grid container spacing={3}>
+                {lockers.withdrawn.map((locker) => (
+                  <Grid item xs={12} sm={6} md={4} key={locker.id}>
+                    <LockerCard
+                      locker={locker}
+                      onEdit={handleEditLocker}
+                      onDelete={handleDeleteClick}
+                      onClick={handleLockerClick}
+                    />
+                  </Grid>
+                ))}
+              </Grid>
+            </Box>
+          )}
+
+          {/* Section 2: Lockers with all assets intact */}
+          {lockers.intact.length > 0 && (
+            <Box>
+              <Typography 
+                variant="h5" 
+                component="h2" 
+                gutterBottom 
+                sx={{ color: '#000000', mb: 2, fontWeight: 'bold' }}
+              >
+                Lockers with All Assets Intact
+              </Typography>
+              <Grid container spacing={3}>
+                {lockers.intact.map((locker) => (
+                  <Grid item xs={12} sm={6} md={4} key={locker.id}>
+                    <LockerCard
+                      locker={locker}
+                      onEdit={handleEditLocker}
+                      onDelete={handleDeleteClick}
+                      onClick={handleLockerClick}
+                    />
+                  </Grid>
+                ))}
+              </Grid>
+            </Box>
+          )}
+        </>
       )}
 
 

@@ -19,6 +19,8 @@ import {
 import AddIcon from '@mui/icons-material/Add';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import LocationOnIcon from '@mui/icons-material/LocationOn';
+import DashboardIcon from '@mui/icons-material/Dashboard';
+import ReceiptIcon from '@mui/icons-material/Receipt';
 import AssetList from '../components/AssetList';
 import AssetForm from '../components/AssetForm';
 import {
@@ -83,14 +85,29 @@ const LockerDetail = () => {
     setFormOpen(true);
   };
 
-  const handleFormSubmit = async (formData) => {
+  const handleFormSubmit = async (formData, files = []) => {
     try {
       if (editingAsset) {
         await updateAsset(editingAsset.id, formData);
         showSnackbar('Asset updated successfully');
       } else {
-        await createAsset(lockerId, formData);
-        showSnackbar('Asset added successfully');
+        // Create the asset first
+        const response = await createAsset(lockerId, formData);
+        const newAssetId = response.id;
+        
+        // Upload files if any were selected
+        if (files && files.length > 0 && newAssetId) {
+          try {
+            const { uploadAssetFiles } = await import('../services/api');
+            await uploadAssetFiles(newAssetId, files);
+            showSnackbar('Asset added successfully with files');
+          } catch (uploadError) {
+            console.error('File upload error:', uploadError);
+            showSnackbar('Asset created but file upload failed: ' + (uploadError.response?.data?.error || uploadError.message), 'error');
+          }
+        } else {
+          showSnackbar('Asset added successfully');
+        }
       }
       setFormOpen(false);
       setEditingAsset(null);
@@ -197,29 +214,65 @@ const LockerDetail = () => {
               </Box>
             </Box>
           </Box>
-          <Button
-            variant="contained"
-            startIcon={<AddIcon />}
-            onClick={handleCreateAsset}
-            sx={{
-              backgroundColor: '#1976d2',
-              color: 'white',
-              fontWeight: 'bold',
-              px: 3,
-              py: 1.5,
-              boxShadow: '0 4px 14px rgba(0,0,0,0.4)',
-              '&:hover': {
-                backgroundColor: '#1565c0',
-                transform: 'translateY(-2px)',
-                boxShadow: '0 6px 20px rgba(0,0,0,0.5)',
-              },
-              transition: 'all 0.3s ease',
-            }}
-          >
-            Add Asset
-          </Button>
+          <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
+            <Button
+              variant="outlined"
+              startIcon={<DashboardIcon />}
+              onClick={() => navigate(`/locker/${lockerId}/dashboard`)}
+              sx={{
+                borderColor: 'rgba(255,255,255,0.3)',
+                color: 'white',
+                '&:hover': {
+                  borderColor: 'rgba(255,255,255,0.5)',
+                  backgroundColor: 'rgba(255,255,255,0.1)',
+                },
+              }}
+            >
+              Dashboard
+            </Button>
+            <Button
+              variant="contained"
+              startIcon={<AddIcon />}
+              onClick={handleCreateAsset}
+              sx={{
+                backgroundColor: '#1976d2',
+                color: 'white',
+                fontWeight: 'bold',
+                px: 3,
+                py: 1.5,
+                boxShadow: '0 4px 14px rgba(0,0,0,0.4)',
+                '&:hover': {
+                  backgroundColor: '#1565c0',
+                  transform: 'translateY(-2px)',
+                  boxShadow: '0 6px 20px rgba(0,0,0,0.5)',
+                },
+                transition: 'all 0.3s ease',
+              }}
+            >
+              Add Asset
+            </Button>
+          </Box>
         </Box>
       </Paper>
+
+      {/* Quick Actions */}
+      <Box sx={{ mb: 3, display: 'flex', gap: 2, flexWrap: 'wrap' }}>
+        <Button
+          variant="outlined"
+          startIcon={<ReceiptIcon />}
+          onClick={() => navigate('/transactions')}
+          sx={{
+            borderColor: 'rgba(255,255,255,0.3)',
+            color: 'white',
+            '&:hover': {
+              borderColor: 'rgba(255,255,255,0.5)',
+              backgroundColor: 'rgba(255,255,255,0.1)',
+            },
+          }}
+        >
+          View All Transactions
+        </Button>
+      </Box>
 
       <Box 
         sx={{ 
@@ -249,6 +302,7 @@ const LockerDetail = () => {
         assets={assets}
         onEdit={handleEditAsset}
         onDelete={handleDeleteClick}
+        onAssetClick={(assetId) => navigate(`/asset/${assetId}`)}
       />
 
       <Button
